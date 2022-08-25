@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -31,10 +32,12 @@ class AuthController extends Controller
 
         $creds = $request->only('email', 'password');
         $token = Auth::attempt($creds);
+        $passVerication = Hash::check($request->password,  $user->password);
 
-
+        if(empty($user) ||  $passVerication == false){
+            return response()->json(['status'=> 'error', 'message' => 'the login is wrong' ], 401  );
+        }
         if ($token) {
-            $user['email'] = $creds;
             $array['token'] = $token;
         } else {
             $array['message'] = 'Incorrect username or password';

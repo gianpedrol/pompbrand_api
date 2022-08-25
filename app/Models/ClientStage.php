@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClientStage extends Model
 {
-    protected $table = 'table_client_phase_stage';
+    protected $table = 'client_phases';
 
     protected $fillable = ['id_user', 'id_phase', 'id_stage'];
 }

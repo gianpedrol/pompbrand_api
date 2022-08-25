@@ -13,7 +13,7 @@ class CreateTableClientPhaseStage extends Migration
      */
     public function up()
     {
-        Schema::create('table_client_phase_stage', function (Blueprint $table) {
+        Schema::create('client_phases', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_user');
             $table->unsignedBigInteger('id_phase');

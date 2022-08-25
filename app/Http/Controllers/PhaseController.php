@@ -47,9 +47,9 @@ class PhaseController extends Controller
         $phases = Phase::all();
 
         foreach ($phases as $key => $stage) {
-            $stage['stages'] = Stage::from('table_stages as stage')
+            $stage['stages'] = Stage::from('stages as stage')
                 ->select('stage.stage')
-                ->join('table_phases as phase', 'phase.id', '=', 'stage.phase_id')
+                ->join('phases as phase', 'phase.id', '=', 'stage.phase_id')
                 ->where('stage.phase_id', $stage['id'])
                 ->get();
         }

@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\PhaseController;
 use App\Http\Controllers\StageController;
+use App\Http\Controllers\UserController;
+use Illuminate\Contracts\Auth\UserProvider;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,9 +19,9 @@ use App\Http\Controllers\StageController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+/*Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
-});
+});*/
 
 //ROTA DE NÃO AUTORIZADO
 Route::get('/401', [AuthController::class, 'unauthorized'])->name('login');
@@ -39,4 +41,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('list/stage', [StageController::class, 'listStages']);
     Route::put('edit/stage/{id}', [StageController::class, 'updateStage']);
     Route::delete('delete/stage/{id}', [StageController::class, 'deleteStage']);
+
+    /** ROTAS RELACIONADAS AO USUÁRIO */
+    Route::post('create/user', [UserController::class, 'createUser']);
+    Route::get('list/users', [UserController::class, 'listUsers']);
 });

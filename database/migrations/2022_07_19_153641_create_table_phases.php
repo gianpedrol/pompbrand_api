@@ -13,7 +13,7 @@ class CreateTablePhases extends Migration
      */
     public function up()
     {
-        Schema::create('table_phases', function (Blueprint $table) {
+        Schema::create('phases', function (Blueprint $table) {
             $table->id();
             $table->string('phase_name');
             $table->timestamps();

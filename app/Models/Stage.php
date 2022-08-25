@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stage extends Model
 {
-    protected $table = 'table_stages';
+    protected $table = 'stages';
 
     protected $fillable = ['phase_id', 'stage'];
 }

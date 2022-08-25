@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Phase extends Model
 {
-    protected $table = 'table_phases';
+    protected $table = 'phases';
 
     protected $fillable = ['phase_name'];
 

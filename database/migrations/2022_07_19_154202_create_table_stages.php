@@ -13,7 +13,7 @@ class CreateTableStages extends Migration
      */
     public function up()
     {
-        Schema::create('table_stages', function (Blueprint $table) {
+        Schema::create('stages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('phase_id');
             $table->text('stage');
