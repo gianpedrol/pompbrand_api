@@ -34,6 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::post('create/phase', [PhaseController::class, 'createPhase']);
     Route::get('list/phase', [PhaseController::class, 'listPhases']);
     Route::put('edit/phase/{id}', [PhaseController::class, 'updatePhase']);
+    Route::get('show/phase/{id}', [PhaseController::class, 'showPhase']);
     Route::delete('delete/phase/{id}', [PhaseController::class, 'deletePhase']);
 
     /** ROTAS RELACIONADAS AS ETAPAS DE CADA FASE */
@@ -45,4 +46,6 @@ Route::middleware('auth:api')->group(function () {
     /** ROTAS RELACIONADAS AO USUÁRIO */
     Route::post('create/user', [UserController::class, 'createUser']);
     Route::get('list/users', [UserController::class, 'listUsers']);
+    Route::get('show/user/{id}', [UserController::class, 'showUser']);
+    Route::post('update/stage/user', [UserController::class, 'updateUserStage']);
 });

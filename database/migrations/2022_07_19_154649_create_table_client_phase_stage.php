@@ -14,16 +14,19 @@ class CreateTableClientPhaseStage extends Migration
     public function up()
     {
         Schema::create('client_phases', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
             $table->id();
-            $table->unsignedBigInteger('id_user');
-            $table->unsignedBigInteger('id_phase');
-            $table->unsignedBigInteger('id_stage');
+            $table->unsignedBigInteger('id_user')->references('id')->on('users')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->unsignedBigInteger('id_phase')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->unsignedBigInteger('id_stage')->references('id')->on('stages')->onUpdate('NO ACTION')->onDelete('CASCADE');
             $table->tinyInteger('status')->comment('0 => Not finished ; 1 => Finished')->default(0);
             $table->timestamps();
 
-            $table->foreign('id_user')->references('id')->on('users')->onUpdate('NO ACTION')->onDelete('CASCADE');
-            $table->foreign('id_phase')->references('id')->on('table_phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
-            $table->foreign('id_stage')->references('id')->on('table_stages')->onUpdate('NO ACTION')->onDelete('CASCADE');
+      /*      $table->foreign('id_user')->references('id')->on('users')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->foreign('id_phase')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->foreign('id_stage')->references('id')->on('stages')->onUpdate('NO ACTION')->onDelete('CASCADE');*/
         });
     }
 
@@ -34,6 +37,8 @@ class CreateTableClientPhaseStage extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_client_phase_stage');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+        Schema::dropIfExists('client_phases');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

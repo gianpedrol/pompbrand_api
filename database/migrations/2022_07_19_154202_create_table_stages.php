@@ -14,12 +14,15 @@ class CreateTableStages extends Migration
     public function up()
     {
         Schema::create('stages', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_general_ci';
             $table->id();
-            $table->unsignedBigInteger('phase_id');
+            $table->unsignedBigInteger('phase_id')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
             $table->text('stage');
             $table->timestamps();
 
-            $table->foreign('phase_id')->references('id')->on('table_phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->foreign('phase_id')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
         });
     }
 
@@ -30,6 +33,8 @@ class CreateTableStages extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('table_stages');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
+        Schema::dropIfExists('stages');
+        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

@@ -10,4 +10,9 @@ class Stage extends Model
     protected $table = 'stages';
 
     protected $fillable = ['phase_id', 'stage'];
+
+    public function users()
+    {
+        return $this->hasMany(ClientStage::class, 'id_stage');
+    }
 }

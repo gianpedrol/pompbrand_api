@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClientStage;
 use App\Models\Phase;
 use App\Models\Stage;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class StageController extends Controller
@@ -33,12 +35,17 @@ class StageController extends Controller
             $createStage->phase_id = $data['phaseID'];
             $createStage->save();
 
+            $users = User::where('role_id', 2)->get();
+            foreach($users as $user){
+                ClientStage::create(['id_user'=> $user->id, 'id_phase' =>  $createStage['phase_id'], 'id_stage' =>  $createStage->id]);
+            }
+
 
             \DB::commit();
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+          //  dd($th->getMessage());
             \DB::rollback();
-            return ['error' => 'Could not write data', 400];
+            return ['error' => 'Could not write data', $th->getMessage(), 400];
         }
 
         return response()->json(['status' => 'success', 'Created Stage Successfully', $createStage], 200);
@@ -73,6 +80,9 @@ class StageController extends Controller
 
         return response()->json($stage, 200);
     }
+
+
+    
     public function deleteStage($id)
     {
         try {

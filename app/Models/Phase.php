@@ -15,4 +15,8 @@ class Phase extends Model
     {
         return $this->hasMany(Stage::class, 'phase_id');
     }
+    public function users()
+    {
+        return $this->hasMany(ClientStage::class, 'id_phase');
+    }
 }

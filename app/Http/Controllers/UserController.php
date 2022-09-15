@@ -92,12 +92,68 @@ class UserController extends Controller
     public function updateUser(Request $request){
 
     }
-    public function showUser(Request $request){
+    public function showUser(Request $request, $id){
+
+        $user = User::where('id',$id)->first();
+        if(!$user){            return response()->json([
+            'error' => "user not found!"
+         ], 404);
+
+
+        }
+
+        $phases = Phase::all();
+
+        
+        foreach ($phases as $key =>$phase){
+          //  $item['Fase'] = Phase::where('id', $phase->id)->get(); 
+
+            $phase['etapas'] = ClientStage::from('client_phases as clientphase')
+            ->select('stages.stage', 'clientphase.status', 'clientphase.id as ParentID')
+            ->leftJoin('stages', 'stages.id', '=', 'clientphase.id_stage')
+            ->leftJoin('phases', 'phases.id', '=', 'stages.phase_id')
+            ->where('clientphase.id_user', '=', $user->id)
+            ->where('phases.id', '=', $phase->id)
+            ->orderBy('clientphase.updated_at', 'DESC')
+            ->get();
+
+        }
+
+
+        if($user){
+            return response()->json([
+                'message' => "list users!", 'data' => $user, 'Fases' => $phases
+            ], 200);
+        }
 
     }
 
 
     public function deleteUser(Request $request){
+
+    }
+
+    public function updateUserStage(Request $request){
+
+        $data = $request->only('stageID', 'status', 'userID');
+
+        $updateStatus = ClientStage::where('id', $data['stageID'])->first();
+        
+        try {
+            \DB::beginTransaction();
+
+            if($updateStatus && $data['status'] <= 1 && $data['status'] >= 0){
+                ClientStage::where('id', $data['stageID'])->update(['status' => $data['status']]);
+            }
+            \DB::commit();
+        } catch (\Throwable $th) {
+   
+            \DB::rollback();
+            return ['error' => 'Could not write data',$th->getMessage(), 400];
+        }
+
+        return response()->json(['message' => "Success"], 200);
+
 
     }
 }

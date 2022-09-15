@@ -78,26 +78,41 @@ class PhaseController extends Controller
         return response()->json($phases, 200);
     }
 
+    public function showPhase($id)
+    {
+        $phase = Phase::where('id', $id)->first();
+
+            $phase['stages'] = Stage::from('stages as stage')
+                ->select('stage.stage', 'stage.id as stageId')
+                ->join('phases as phase', 'phase.id', '=', 'stage.phase_id')
+                ->where('stage.phase_id', $phase->id)
+                ->get();
+        
+
+        return response()->json($phase, 200);
+    }
+
     public function deletePhase($id)
     {
         try {
             \DB::beginTransaction();
 
             $phase = Phase::where('id', $id)->first();
-
+          //  dd($phase);
             if (!empty($phase)) {
-                Phase::findOrFail($id)->delete();
+              //  Phase::findOrFail($id)->delete();
+                 $phase->forceDelete();
+
+                //dd($check);
                 return response()->json(['message' => 'Phase successfully deleted'], 200);
             } else {
                 return response()->json(['error' => 'cant found the phase'], 404);
             }
-
-
             \DB::commit();
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+    //        dd($th->getMessage());
             \DB::rollback();
-            return ['error' => 'Could not write data', 400];
+            return ['error' => 'Could not write data',$th->getMessage(), 400];
         }
     }
 }
