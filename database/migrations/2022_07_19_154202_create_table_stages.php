@@ -18,7 +18,7 @@ class CreateTableStages extends Migration
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
             $table->id();
-            $table->unsignedBigInteger('phase_id')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->unsignedBigInteger('phase_id');
             $table->text('stage');
             $table->timestamps();
 

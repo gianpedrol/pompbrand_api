@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\emailPassword;
 use App\Models\ClientStage;
 use App\Models\Phase;
 use App\Models\Stage;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -24,9 +27,9 @@ class UserController extends Controller
 
         $user = User::where('email', $data['email'])->first();
 
-      /*  if (!empty($user)) {
+       if (!empty($user)) {
             return response()->json(['error' =>"User already exists!"], 400);
-        }*/
+        }
 
         $phases = Phase::all();
         $stages = Stage::all();
@@ -57,10 +60,19 @@ class UserController extends Controller
 
 
             \DB::commit();
+            
+            try {
+                /* Enviar e-mail para o usuário com sua senha de acesso */
+                Mail::to($newUser->email)->send(new emailPassword($data, $senha_md5 ));
+
+            } catch (Exception $ex) {
+                return response()->json(['error' => 'Não foi possível enviar', $ex], 500);
+            }
+            
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+           // dd($th->getMessage());
             \DB::rollback();
-            return ['error' => 'Could not write data', 400];
+            return ['error' => 'Could not write data', $th->getMessage(), 400];
         }
 
         return response()->json([
@@ -89,8 +101,29 @@ class UserController extends Controller
         ], 200);
 
     }
-    public function updateUser(Request $request){
+    public function updateUser($id, Request $request){
+        $data = $request->only('name', 'phone', 'cpf', 'email');
+        
+        $user = User::where('id',$id)->first();
+        if(!$user){            return response()->json([
+            'error' => "user not found!"
+         ], 404);
+        }
+        try {
+            \DB::beginTransaction();
 
+            $user->update($data);
+  
+            \DB::commit();
+        } catch (\Throwable $th) {
+           // dd($th->getMessage());
+            \DB::rollback();
+            return ['error' => 'Não foi possivel salvar no banco de dados', 'erro' => $th->getMessage(), 400];
+        }
+
+
+        return response()->json(['message' => 'Usuário atualizado com sucesso!']);
+        
     }
     public function showUser(Request $request, $id){
 
@@ -130,7 +163,28 @@ class UserController extends Controller
 
 
     public function deleteUser(Request $request){
+        if ($request->user()->role_id != 1) {
+                return response()->json(['error' => "Não Autorizado"], 401);
+        }
+        
+        $id = $request->id;
+        $userCheck = User::where('id', $id)->first();
 
+        if(empty($userCheck)){
+            return response()->json(['message' => 'Não foi possível encontrar o usuário'], 404);
+        }
+
+        try {
+            $user = User::findOrFail($id)->delete();
+
+            if(!$user){
+                return response()->json(['message' => 'Não foi possível deletar o usuário'], 500);
+            }
+            return response()->json(['message' => 'Usuário deletado'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Não foi possível deletar o usuário', $e], 400);
+        }
     }
 
     public function updateUserStage(Request $request){

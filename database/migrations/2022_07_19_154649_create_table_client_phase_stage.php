@@ -18,6 +18,7 @@ class CreateTableClientPhaseStage extends Migration
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
             $table->id();
+            
             $table->unsignedBigInteger('id_user')->references('id')->on('users')->onUpdate('NO ACTION')->onDelete('CASCADE');
             $table->unsignedBigInteger('id_phase')->references('id')->on('phases')->onUpdate('NO ACTION')->onDelete('CASCADE');
             $table->unsignedBigInteger('id_stage')->references('id')->on('stages')->onUpdate('NO ACTION')->onDelete('CASCADE');

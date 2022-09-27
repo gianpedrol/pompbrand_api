@@ -17,7 +17,7 @@ class CreateTablePhases extends Migration
             $table->engine = 'InnoDB';
             $table->charset = 'utf8';
             $table->collation = 'utf8_general_ci';
-            $table->id()->onUpdate('NO ACTION')->onDelete('CASCADE');
+            $table->id();
             $table->string('phase_name');
             $table->timestamps();
         });
@@ -30,8 +30,6 @@ class CreateTablePhases extends Migration
      */
     public function down()
     {
-        DB::statement('SET FOREIGN_KEY_CHECKS = 0');
         Schema::dropIfExists('phases');
-        DB::statement('SET FOREIGN_KEY_CHECKS = 1');
     }
 }

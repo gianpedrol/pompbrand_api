@@ -97,17 +97,12 @@ class PhaseController extends Controller
         try {
             \DB::beginTransaction();
 
-            $phase = Phase::where('id', $id)->first();
-          //  dd($phase);
-            if (!empty($phase)) {
-              //  Phase::findOrFail($id)->delete();
-                 $phase->forceDelete();
+
+            Phase::findOrFail($id)->delete();
+               //  $phase->forceDelete();
 
                 //dd($check);
-                return response()->json(['message' => 'Phase successfully deleted'], 200);
-            } else {
-                return response()->json(['error' => 'cant found the phase'], 404);
-            }
+
             \DB::commit();
         } catch (\Throwable $th) {
     //        dd($th->getMessage());
