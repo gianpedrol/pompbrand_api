@@ -50,5 +50,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('update/stage/user', [UserController::class, 'updateUserStage']);
     Route::put('update/user/{id}', [UserController::class, 'updateUser']);
     Route::delete('delete/user/{id}', [UserController::class, 'deleteUser']);
+    Route::post('upload/user/doc', [UserController::class, 'updateDocsUser']);
+    Route::get('doc/user/{id}', [UserController::class, 'getDocsUser']);
+
     
 });

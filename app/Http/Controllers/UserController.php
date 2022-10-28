@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\emailPassword;
 use App\Models\ClientStage;
+use App\Models\Documents;
 use App\Models\Phase;
 use App\Models\Stage;
 use App\Models\User;
@@ -209,5 +210,68 @@ class UserController extends Controller
         return response()->json(['message' => "Success"], 200);
 
 
+    }
+
+    public function updateDocsUser(Request $request)
+    {
+        if ($request->user()->role_id != 1) {
+            if (!$request->user()->permission_user($request->user()->id, 1)) {
+                return response()->json(['message' => "Não Autorizado"], 401);
+            }
+        }
+
+
+
+        $filename = '';
+        $user = User::where('id', $request->id_user)->first();
+
+        if ($request->hasFile('file')) {
+
+            $file = $request->file('file');
+
+            $file_name = time() . '-' . $file->getClientOriginalName();
+            $file_path = 'uploads/docs/';
+
+            $file->move($file_path, $file_name);
+
+            if ($request->hasFile('file') != "") {
+                $filename = $file_name;
+
+                try{
+
+                $newDocument = new Documents();
+                $newDocument->user_id = $request->userID;
+                $newDocument->document  = $filename;
+                $newDocument->save();                
+
+                }catch (\Throwable $th) {
+   
+                    \DB::rollback();
+                    return ['error' => 'Could not write data',$th->getMessage(), 400];
+            }
+        }
+        
+            return response()->json(
+                ['status' => 'success', 'Arquivo enviado com sucesso!'],
+                200
+            );
+
+        }
+    }
+
+    public function getDocsUser($id){
+        $documents = Documents::where('user_id', $id)->get();
+
+        $data = [];
+        foreach ($documents as $item){
+            
+            $data[] = [
+                'file' => config('app.url') .'uploads/docs/' . $item->document
+            ];
+        }
+        return response()->json(
+            ['status' => 'success', $data],
+            200
+        );
     }
 }
