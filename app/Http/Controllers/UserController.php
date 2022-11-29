@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Mail\emailPassword;
 use App\Models\ClientStage;
 use App\Models\Documents;
+use App\Models\Finance;
 use App\Models\Phase;
 use App\Models\Stage;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
+use File;
+
 
 class UserController extends Controller
 {
@@ -229,7 +233,7 @@ class UserController extends Controller
 
             $file = $request->file('file');
 
-            $file_name = time() . '-' . $file->getClientOriginalName();
+            $file_name = $file->getClientOriginalName();
             $file_path = 'uploads/docs/';
 
             $file->move($file_path, $file_name);
@@ -264,14 +268,127 @@ class UserController extends Controller
 
         $data = [];
         foreach ($documents as $item){
-            
             $data[] = [
-                'file' => config('app.url') .'uploads/docs/' . $item->document
+                'file' => config('app.url') .'uploads/docs/' . $item->document,
+                'id' => $item->id
             ];
         }
         return response()->json(
             ['status' => 'success', $data],
             200
         );
+    }
+
+    public function deleteDocument(Request $request, $id){
+        if ($request->user()->role_id != 1) {
+            return response()->json(['error' => "Não Autorizado"], 401);
+    }
+    
+    $documents = Documents::where('id', $id)->first();
+
+        if(empty($documents)){
+            return response()->json(['message' => 'Não foi possível encontrar o documento'], 404);
+        }
+
+        
+        try {
+            $pathDoc ='uploads/docs/' . $documents->document;
+            $doc = File::delete($pathDoc);;
+            $document = Documents::findOrFail($id)->delete();
+
+            if(!$document && !$doc){
+                return response()->json(['message' => 'Não foi possível deletar o Documento'], 500);
+            }
+            return response()->json(['message' => 'Documento deletado'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Não foi possível deletar o Documento', $e], 400);
+        }
+    }
+
+    public function uploadFinanceUser(Request $request){
+        if ($request->user()->role_id != 1) {
+            if (!$request->user()->permission_user($request->user()->id, 1)) {
+                return response()->json(['message' => "Não Autorizado"], 401);
+            }
+        }
+
+        $filename = '';
+        if ($request->hasFile('file')) {
+
+            $file = $request->file('file');
+
+            $file_name = $file->getClientOriginalName();
+            $file_path = 'uploads/finances/';
+
+            $file->move($file_path, $file_name);
+
+            if ($request->hasFile('file') != "") {
+                $filename = $file_name;
+
+                try{
+
+                $newDocument = new Finance();
+                $newDocument->user_id = $request->userID;
+                $newDocument->document  = $filename;
+                $newDocument->save();                
+
+                }catch (\Throwable $th) {
+    
+                    \DB::rollback();
+                    return ['error' => 'Could not write data',$th->getMessage(), 400];
+            }
+        }
+        
+            return response()->json(
+                ['status' => 'success', 'Arquivo enviado com sucesso!'],
+                200
+            );
+        }
+    }
+
+    public function getFinanceUser($id){
+        $finances = Finance::where('user_id', $id)->get();
+
+        $data = [];
+        foreach ($finances as $item){
+            
+            $data[] = [
+                'file' => config('app.url') .'uploads/finances/' . $item->document,
+                'id' => $item->id
+            ];
+        }
+        return response()->json(
+            ['status' => 'success', $data],
+            200
+        );
+    }
+
+    
+    public function deleteFinance(Request $request, $id){
+        if ($request->user()->role_id != 1) {
+            return response()->json(['error' => "Não Autorizado"], 401);
+    }
+    
+    $finances = Finance::where('id', $id)->first();
+   
+        if(empty($finances)){
+            return response()->json(['message' => 'Não foi possível encontrar o documento'], 404);
+        }
+
+        
+        try {
+            $pathDoc ='uploads/finances/' . $finances->document;
+            $doc = File::delete($pathDoc);;
+            $document = Finance::findOrFail($id)->delete();
+
+            if(!$document && !$doc){
+                return response()->json(['message' => 'Não foi possível deletar o Documento'], 500);
+            }
+            return response()->json(['message' => 'Documento deletado'], 200);
+
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Não foi possível deletar o Documento', $e], 400);
+        }
     }
 }
