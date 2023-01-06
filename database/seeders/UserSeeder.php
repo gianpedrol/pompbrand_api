@@ -17,12 +17,22 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'id' => 1,
-                'name' => 'Pomp Brand',
-                'cpf' => '41146470827',
+                'name' => 'Dev Eika',
+                'cpf' => '',
                 'role_id' => '1',
                 'status' => 1,
-                'email' => 'dev@pompbrand.com.br',
+                'email' => 'dev@agenciaeika.com',
                 'password' => bcrypt('654321'),
+                'remember_token' => '',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Agência Eika',
+                'cpf' => '',
+                'role_id' => '1',
+                'status' => 1,
+                'email' => 'contato@agenciaeika.com',
+                'password' => bcrypt('@243838Senha'),
                 'remember_token' => '',
             ],
 
