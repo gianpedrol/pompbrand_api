@@ -85,7 +85,7 @@ class UserController extends Controller
 
     public function listUsers()
     {
-        $users = User::all();
+        $users = User::where('role_id', '!=', 1)->get();
 
         foreach ($users as $user) {
 
